@@ -1,4 +1,4 @@
-import { compareDesc, format } from "date-fns";
+import { compareDesc, format, parseISO } from "date-fns";
 import Link from "next/link";
 
 interface Blog {
@@ -27,7 +27,9 @@ export default function BlogList({
             <span className="flex-1" key={blog._id}>
               {blog.title}
             </span>
-            <span>{format(new Date(blog.publishedAt), "MMM dd, yyyy")}</span>
+            <span>
+              {format(new Date(blog.publishedAt.split("T")[0]), "MMM dd, yyyy")}
+            </span>
           </div>
         </Link>
       ))}
