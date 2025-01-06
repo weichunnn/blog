@@ -53,9 +53,6 @@ export default function BlogPost({
   blog: Blog;
   minimal?: boolean;
 }) {
-  if (!blog?.body?.code) {
-    console.log("adfads");
-  }
   const MDXContent = useMDXComponent(blog.body.code);
 
   return (
