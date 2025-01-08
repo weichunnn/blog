@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import LinkAttributeType from "@/interface/LinkAttributeType";
+import { YouTubeEmbed } from "@next/third-parties/google";
 
 const CustomLink = (props: any) => {
   const { href, className, children, product } = props;
@@ -48,16 +49,32 @@ const CustomImage = (props: any) => {
   );
 };
 
-const Embed = ({ src, ...props }: { src: string; props: any }) => {
-  return (
-    <iframe
-      className="aspect-video w-full rounded-xl"
-      src={src}
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowFullScreen
-      {...props}
-    />
-  );
+const Embed = ({
+  src,
+  videoid,
+  ...props
+}: {
+  src?: string;
+  videoid?: string;
+  props: any;
+}) => {
+  if (videoid) {
+    return <YouTubeEmbed style="border-radius: 0.75rem" videoid={videoid} />;
+  }
+
+  if (src) {
+    return (
+      <iframe
+        className="aspect-video w-full rounded-xl"
+        src={src}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        {...props}
+      />
+    );
+  }
+
+  return null;
 };
 
 const BlockQuote = (props: any) => {
