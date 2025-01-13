@@ -1,14 +1,7 @@
 # weichuntan.com
 
-![Thumbnail](/public/thumbnail.png)
+![Thumbnail](/public/thumbnail-v2.png)
 
-A small internet garden to leave some traces of myself on the WWW.
+Just writing something everyday so I can look back and remember.
 
-I write about things that I've learned, things that happened in my life, and things that I'm interested in.
-
-This blog page is inspired by
-
-- [leerob.io](https://leerob.io/)
-- [macwright.com](https://macwright.com/)
-- [jquiambao.com](https://www.jquiambao.com/)
-- [jzhao.xyz](https://jzhao.xyz/)
+Feel free to fork and make your own!
