@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 
-import { allBlogs } from "contentlayer/generated";
+import { allBlogs } from ".contentlayer/generated/index.mjs";
 import { cleanMDXFile, splitIntoChunks } from "./utils";
 import { getChangedFiles } from "./git";
 import { getEmbeddingsRemote } from "./embeddings";
