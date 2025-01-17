@@ -42,7 +42,8 @@ export async function generateMetadata({
   if (!blog) return {};
 
   const { title, summary, publishedAt } = blog;
-  const description = summary;
+  const description =
+    summary || "a piece of writing about a particular subject";
   const ogImage = {
     url: `${HOST}/api/og?title=${title}`,
   };
@@ -58,12 +59,14 @@ export async function generateMetadata({
       description,
       images: [ogImage],
       publishedTime: publishedAt,
+      siteName: "personal blog of @_weichunnn",
+      authors: ["wei chun"],
     },
     twitter: {
+      card: "summary_large_image",
       title,
       description,
       images: ogImage,
-      card: "summary_large_image",
     },
   };
 }
