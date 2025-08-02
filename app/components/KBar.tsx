@@ -201,13 +201,13 @@ const Kbd = ({ children }: { children: ReactNode }) => (
 );
 
 const Positioner = ({ children }: { children: ReactNode }) => (
-  <KBarPositioner className="fixed flex items-start justify-center w-full inset-0 p-[14vh_16px_16px] box-border backdrop-blur-sm">
+  <KBarPositioner className="fixed flex items-start justify-center w-full inset-0 p-[14vh_16px_16px] box-border backdrop-blur-xs">
     {children}
   </KBarPositioner>
 );
 
 const Search = () => (
-  <KBarSearch className="p-4 w-full	outline-none border-none m-0 dark:bg-[#1C191C] bg-white" />
+  <KBarSearch className="p-4 w-full	outline-hidden border-none m-0 dark:bg-[#1C191C] bg-white" />
 );
 
 const Animator = ({ children }: { children: ReactNode }) => (

@@ -81,9 +81,11 @@ export default function SearchBar() {
                     <h3 className="text-md font-semibold group-hover:text-primary">
                       {result.title}
                     </h3>
-                    <ReactMarkdown className="text-muted-foreground mt-2">
-                      {truncateContent(result.content, 150)}
-                    </ReactMarkdown>
+                    <div className="text-muted-foreground mt-2">
+                      <ReactMarkdown>
+                        {truncateContent(result.content, 150)}
+                      </ReactMarkdown>
+                    </div>
                   </article>
                 </Link>
               </CardContent>
