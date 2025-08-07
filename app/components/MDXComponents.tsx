@@ -96,11 +96,26 @@ const BlockQuote = (props: any) => {
   );
 };
 
+const CustomUL = (props: any) => {
+  return <ul className="space-y-1" {...props} />;
+};
+
+const CustomOL = (props: any) => {
+  return <ol className="space-y-1" {...props} />;
+};
+
+const CustomLI = (props: any) => {
+  return <li className="my-1" {...props} />;
+};
+
 const MDXComponents = {
   Embed: Embed,
   Image: CustomImage,
   a: CustomLink,
   blockquote: BlockQuote,
+  ul: CustomUL,
+  ol: CustomOL,
+  li: CustomLI,
 };
 
 export { CustomLink };

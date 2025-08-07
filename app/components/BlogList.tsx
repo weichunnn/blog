@@ -25,7 +25,7 @@ export default function BlogList({
         <Link key={index} href={`/blog/${blog.slug}`}>
           <div className="flex flex-row justify-between gap-4">
             <span className="flex-1" key={blog._id}>
-              {blog.title}
+              {blog.title.toLowerCase()}
             </span>
             <span>
               {format(new Date(blog.publishedAt.split("T")[0]), "MMM dd, yyyy")}

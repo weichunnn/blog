@@ -13,11 +13,11 @@ export default function Page() {
   const recentBlogs = sortedBlogs.slice(0, 10);
   return (
     <>
-      <Header title={"Recent Blogs"} className="mb-4" />
+      <Header title="recent" className="mb-2" />
       <meta property="og:image" content={`${HOST}/api/og`} />
       {recentBlogs.map((blog: Blog, index: number) => {
         return (
-          <div className="mb-80" key={index}>
+          <div className="mb-50" key={index}>
             <BlogPost blog={blog} minimal />
           </div>
         );

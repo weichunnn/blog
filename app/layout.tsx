@@ -19,7 +19,7 @@ export default function RootLayout({
       </head>
       <body className="pb-10">
         <Providers>
-          <main className="px-6 my-10 mx-auto w-full md:max-w-3xl md:my-20">
+          <main className="px-6 my-10 mx-auto w-full md:max-w-2xl md:my-20">
             <div className="mb-24 w-full">
               <Menubar />
             </div>
