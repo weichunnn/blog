@@ -1,9 +1,8 @@
 import { Pool } from "pg";
 
-import { allBlogs } from ".contentlayer/generated/index.mjs";
-import { cleanMDXFile, splitIntoChunks } from "./utils";
+import { allBlogs } from "../../.contentlayer/generated/index.mjs";
 import { getChangedFiles } from "./git";
-import { getEmbeddingsRemote } from "./embeddings";
+import { getEmbeddingsBatch } from "./embeddings";
 import { parseArgs } from "node:util";
 import cliProgress from "cli-progress";
 
@@ -16,41 +15,23 @@ async function createEmbeddingsTable() {
 
   try {
     await client.query(`
-      create extension if not exists vector with schema public;
+      CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA public;
 
-      create table if not exists "public"."documents" (
-        id UUID primary key default gen_random_uuid(),
-        title text,
-        content text,
-        slug text,
+      CREATE TABLE IF NOT EXISTS "public"."documents" (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title TEXT,
+        content TEXT,
+        slug TEXT UNIQUE,
         embedding vector(1024)
       );
+
+      CREATE INDEX IF NOT EXISTS documents_embedding_idx
+        ON "public"."documents"
+        USING hnsw (embedding vector_cosine_ops);
     `);
-    console.log("Embedding tables created if not exist successfully");
+    console.log("Embedding tables and indexes created successfully");
   } catch (error) {
     console.error("Error creating Embedding tables:", error);
-  } finally {
-    client.release();
-  }
-}
-
-export async function storeEmbeddings(
-  text: string,
-  slug: string,
-  title: string
-) {
-  const client = await pool.connect();
-
-  try {
-    const vector = await getEmbeddingsRemote(text);
-    if (!vector) return;
-
-    await client.query(
-      `insert into "public"."documents" (content, slug, title, embedding) values ($1, $2, $3, $4::vector)`,
-      [text, slug, title, vector]
-    );
-  } catch (error) {
-    console.error(`Error storing ${title}:`, error);
   } finally {
     client.release();
   }
@@ -60,7 +41,7 @@ async function deleteExistingEmbeddings(slug: string) {
   const client = await pool.connect();
 
   try {
-    await client.query(`delete from "public"."documents" where slug = $1`, [
+    await client.query(`DELETE FROM "public"."documents" WHERE slug = $1`, [
       slug,
     ]);
     console.log(`Deleted existing embeddings for slug: ${slug}`);
@@ -99,42 +80,85 @@ async function generate() {
   if (shouldRefresh) {
     console.log("Refreshing all embeddings");
     const client = await pool.connect();
-    await client.query(`drop table if exists "public"."documents"`);
+    await client.query(`DROP TABLE IF EXISTS "public"."documents"`);
+    client.release();
     changedBlogs = allBlogs;
   }
 
   await createEmbeddingsTable();
-  const multibar = new cliProgress.MultiBar({
-    clearOnComplete: false,
-    hideCursor: true,
-    format: "{bar} | {percentage}% | {value}/{total} | {title}",
-  });
 
-  const blogBar = multibar.create(changedBlogs.length, 0, {
-    title: "Blogs Progress",
-  });
-
-  for (const blog of changedBlogs) {
-    const { url, headline } = blog.structuredData;
-    const slug = url.split(`blog/`).pop() as string;
-    if (!shouldRefresh) {
-      await deleteExistingEmbeddings(slug);
-    }
-    const text = cleanMDXFile(blog.body.raw);
-    const chunks = await splitIntoChunks(text);
-
-    for (const chunk of chunks) {
-      await storeEmbeddings(chunk.text, slug, headline);
-      await delay(1000);
-    }
-    blogBar.increment();
+  if (changedBlogs.length === 0) {
+    console.log("No blog changes to process");
+    await pool.end();
+    return;
   }
 
-  multibar.stop();
+  const bar = new cliProgress.SingleBar({
+    clearOnComplete: false,
+    hideCursor: true,
+    format: "{bar} | {percentage}% | {value}/{total} blogs",
+  });
+  bar.start(changedBlogs.length, 0);
+
+  const BATCH_SIZE = 20;
+  for (let i = 0; i < changedBlogs.length; i += BATCH_SIZE) {
+    const batch = changedBlogs.slice(i, i + BATCH_SIZE);
+
+    const texts = batch.map((blog) => {
+      const { headline } = blog.structuredData;
+      return `${headline}\n\n${blog.body.raw}`;
+    });
+
+    const vectors = await getEmbeddingsBatch(texts, "document");
+    if (!vectors) {
+      console.error(`\nFailed to embed batch starting at index ${i}`);
+      bar.increment(batch.length);
+      continue;
+    }
+
+    const client = await pool.connect();
+    try {
+      const values: string[] = [];
+      const params: unknown[] = [];
+      let paramIdx = 1;
+
+      for (let j = 0; j < batch.length; j++) {
+        const blog = batch[j];
+        const { url, headline } = blog.structuredData;
+        const slug = url.split(`blog/`).pop() as string;
+
+        values.push(
+          `($${paramIdx}, $${paramIdx + 1}, $${paramIdx + 2}, $${paramIdx + 3}::vector)`
+        );
+        params.push(texts[j], slug, headline, vectors[j]);
+        paramIdx += 4;
+      }
+
+      if (!shouldRefresh) {
+        const slugs = batch.map(
+          (blog) => blog.structuredData.url.split(`blog/`).pop() as string
+        );
+        await client.query(
+          `DELETE FROM "public"."documents" WHERE slug = ANY($1)`,
+          [slugs]
+        );
+      }
+
+      await client.query(
+        `INSERT INTO "public"."documents" (content, slug, title, embedding) VALUES ${values.join(", ")}`,
+        params
+      );
+    } catch (error) {
+      console.error(`\nError storing batch starting at index ${i}:`, error);
+    } finally {
+      client.release();
+    }
+
+    bar.increment(batch.length);
+  }
+
+  bar.stop();
+  await pool.end();
 }
 
 generate();
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
