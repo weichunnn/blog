@@ -13,7 +13,4 @@ module.exports = withContentlayer({
 
     return config;
   },
-  experimental: {
-    turbo: {},
-  },
 });
