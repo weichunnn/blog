@@ -8,10 +8,9 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const title = searchParams.get("title") ?? "My Internet Garden";
 
-  const font = fetch(
-    new URL("../../../public/fonts/barlow-bold.ttf", import.meta.url)
-  ).then((res) => res.arrayBuffer());
-  const fontData = await font;
+  const fontData = await fetch(`${HOST}/fonts/barlow-bold.ttf`).then((res) =>
+    res.arrayBuffer()
+  );
 
   return new ImageResponse(
     (
