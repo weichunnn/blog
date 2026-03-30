@@ -10,13 +10,13 @@ export interface SearchResult {
   similarity: number;
 }
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const query = searchParams.get("q");
-    const matchThreshold = Number(searchParams.get("matchThreshold")) || 0.5;
+    const matchThreshold = Number(searchParams.get("matchThreshold")) || 0.3;
     const matchCount = Number(searchParams.get("matchCount")) || 10;
 
     if (!query) {
@@ -24,6 +24,12 @@ export async function GET(req: NextRequest) {
     }
 
     const embedding = await getEmbeddingsRemote(query, "query");
+    if (!embedding) {
+      return NextResponse.json(
+        { error: "Failed to generate embedding" },
+        { status: 502 }
+      );
+    }
 
     const databaseClient = new Client(process.env.DATABASE_URL);
     await databaseClient.connect();

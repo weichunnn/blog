@@ -47,15 +47,26 @@ export default function SearchBar() {
     setQuery(e.target.value);
   };
 
-  const truncateContent = (content: string, maxLength: number) => {
-    return content.length > maxLength
-      ? content.substring(0, maxLength) + "…"
-      : content;
+  const cleanAndTruncate = (
+    content: string,
+    title: string,
+    maxLength: number
+  ) => {
+    const cleaned = content
+      .replace(title, "")
+      .replace(/<[^>]+\/?\s*>/g, "")
+      .replace(/^#+ .+$/gm, "")
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/\n{2,}/g, "\n")
+      .trim();
+    return cleaned.length > maxLength
+      ? cleaned.substring(0, maxLength) + "…"
+      : cleaned;
   };
 
   return (
     <>
-      <Header title="Search Semantically" className="mb-4" />
+      <Header title="Search Archive" className="mb-4" />
       <Input
         type="text"
         placeholder="What's the best day of my life?"
@@ -83,7 +94,7 @@ export default function SearchBar() {
                     </h3>
                     <div className="text-muted-foreground mt-2">
                       <ReactMarkdown>
-                        {truncateContent(result.content, 150)}
+                        {cleanAndTruncate(result.content, result.title, 150)}
                       </ReactMarkdown>
                     </div>
                   </article>
