@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
         <div tw="flex">
           <div tw="flex flex-col">
             <span tw="mb-4 text-6xl">{title}</span>
-            <span>weichuntan.com</span>
+            <span>wchun.xyz</span>
           </div>
         </div>
       </div>

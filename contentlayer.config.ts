@@ -10,7 +10,7 @@ import rehypePrettyCode, {
 } from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 
-const HOST = "https://www.weichuntan.com";
+const HOST = "https://www.wchun.xyz";
 
 const structuredData = (doc: any): WithContext<Article> => ({
   "@context": "https://schema.org",

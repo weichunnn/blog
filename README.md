@@ -1,4 +1,4 @@
-# weichuntan.com
+# wchun.xyz
 
 ![Thumbnail](/public/thumbnail-v2.png)
 
