@@ -1,4 +1,4 @@
-import { allBlogs, Blog } from "@/lib/blog";
+import { allBlogs, Blog } from "contentlayer/generated";
 import { Metadata } from "next";
 import { HOST } from "@/constants/constant";
 import BlogPost from "@/components/BlogPost";
@@ -15,7 +15,7 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const blog = allBlogs.find((blog: Blog) => blog.slug === slug);
+  const blog = allBlogs.find((blog: Blog) => blog._raw.flattenedPath === slug);
   if (!blog) throw new Error(`Blog not found for slug: ${slug}`);
 
   return (

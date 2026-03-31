@@ -1,4 +1,4 @@
-import { allBlogs } from "@/lib/blog";
+import { allBlogs } from "contentlayer/generated";
 import Header from "@/components/Header";
 import BlogList from "@/components/BlogList";
 import BlogTags from "@/components/BlogTags";
