@@ -1,15 +1,13 @@
-"use client";
-
 import { format } from "date-fns";
-import { Blog } from "contentlayer/generated";
-import { useMDXComponent } from "next-contentlayer2/hooks";
+import { Blog } from "@/lib/blog";
+import { compileMDX } from "@/lib/mdx";
 import Link from "next/link";
 import Header from "./Header";
 import MDXComponents from "./MDXComponents";
 import BlogNavigation from "./BlogNavigation";
 
-export default function BlogPost({ blog, minimal }: { blog: Blog; minimal?: boolean }) {
-  const MDXContent = useMDXComponent(blog.body.code);
+export default async function BlogPost({ blog, minimal }: { blog: Blog; minimal?: boolean }) {
+  const MDXContent = await compileMDX(blog.body.raw);
   const publishedAt = new Date(blog.publishedAt);
 
   const timestampInformation = `${format(publishedAt, "MMMM do, y")}`;

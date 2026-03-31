@@ -1,5 +1,5 @@
 import { HOST } from "@/constants/constant";
-import { allBlogs } from "contentlayer/generated";
+import { allBlogs } from "@/lib/blog";
 import { MetadataRoute } from "next";
 
 const postsSitemap: MetadataRoute.Sitemap = allBlogs.map((blog) => ({

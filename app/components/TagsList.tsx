@@ -1,4 +1,3 @@
-import { allBlogs } from "contentlayer/generated";
 import Tag from "./Tag";
 
 export default function TagList({

@@ -1,7 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { allBlogs, Blog } from "contentlayer/generated";
+import { allBlogs, Blog } from "@/lib/blog";
 import { compareDesc } from "date-fns";
 
 interface BlogNavigationProps {
@@ -9,7 +7,7 @@ interface BlogNavigationProps {
 }
 
 export default function BlogNavigation({ currentBlog }: BlogNavigationProps) {
-  const sortedBlogs = allBlogs.sort((a, b) =>
+  const sortedBlogs = allBlogs.toSorted((a, b) =>
     compareDesc(new Date(a.publishedAt), new Date(b.publishedAt))
   );
 

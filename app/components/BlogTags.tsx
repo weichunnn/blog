@@ -1,4 +1,4 @@
-import { allBlogs } from "contentlayer/generated";
+import { allBlogs } from "@/lib/blog";
 import TagList from "@/components/TagsList";
 
 export default function BlogTags() {

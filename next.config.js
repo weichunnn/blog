@@ -1,10 +1,15 @@
-const { withContentlayer } = require("next-contentlayer2");
-
 /** @type {import('next').NextConfig} */
-const nextConfig = { reactStrictMode: true };
-
-module.exports = withContentlayer({
-  ...nextConfig,
+const nextConfig = {
+  reactStrictMode: true,
+  serverExternalPackages: ["shiki", "rehype-pretty-code"],
+  turbopack: {
+    rules: {
+      "*.md": {
+        loaders: ["raw-loader"],
+        as: "*.js",
+      },
+    },
+  },
   webpack: function (config, options) {
     config.module.rules.push({
       test: /\.md$/,
@@ -13,4 +18,6 @@ module.exports = withContentlayer({
 
     return config;
   },
-});
+};
+
+module.exports = nextConfig;

@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { allBlogs, Blog } from "contentlayer/generated";
+import { allBlogs, Blog } from "@/lib/blog";
 import { compareDesc } from "date-fns";
 import BlogPost from "@/components/BlogPost";
 import Header from "@/components/Header";
 import { HOST } from "./constants/constant";
 
 export default function Page() {
-  const sortedBlogs = allBlogs.sort((a, b) =>
+  const sortedBlogs = allBlogs.toSorted((a, b) =>
     compareDesc(new Date(a.publishedAt), new Date(b.publishedAt))
   );
 
