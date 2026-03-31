@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 
-import { allBlogs } from "../../.contentlayer/generated/index.mjs";
+import { allBlogs } from "../../.content-collections/generated";
 import { getChangedFiles } from "./git";
 import { getEmbeddingsBatch } from "./embeddings";
 import { parseArgs } from "node:util";
@@ -66,15 +66,11 @@ async function generate() {
   const { allChanges, deletes } = getChangedFiles("mdx");
 
   allBlogs
-    .filter((blog) => deletes.includes(`content/${blog._raw.sourceFilePath}`))
-    .forEach((blog) =>
-      deleteExistingEmbeddings(
-        blog.structuredData.url.split(`blog/`).pop() as string
-      )
-    );
+    .filter((blog) => deletes.includes(`content/${blog._meta.filePath}`))
+    .forEach((blog) => deleteExistingEmbeddings(blog.slug));
 
   let changedBlogs = allBlogs.filter((blog) =>
-    allChanges.includes(`content/${blog._raw.sourceFilePath}`)
+    allChanges.includes(`content/${blog._meta.filePath}`)
   );
 
   if (shouldRefresh) {
@@ -105,8 +101,7 @@ async function generate() {
     const batch = changedBlogs.slice(i, i + BATCH_SIZE);
 
     const texts = batch.map((blog) => {
-      const { headline } = blog.structuredData;
-      return `${headline}\n\n${blog.body.raw}`;
+      return `${blog.title}\n\n${blog.content}`;
     });
 
     const vectors = await getEmbeddingsBatch(texts, "document");
@@ -124,20 +119,16 @@ async function generate() {
 
       for (let j = 0; j < batch.length; j++) {
         const blog = batch[j];
-        const { url, headline } = blog.structuredData;
-        const slug = url.split(`blog/`).pop() as string;
 
         values.push(
           `($${paramIdx}, $${paramIdx + 1}, $${paramIdx + 2}, $${paramIdx + 3}::vector)`
         );
-        params.push(texts[j], slug, headline, vectors[j]);
+        params.push(texts[j], blog.slug, blog.title, vectors[j]);
         paramIdx += 4;
       }
 
       if (!shouldRefresh) {
-        const slugs = batch.map(
-          (blog) => blog.structuredData.url.split(`blog/`).pop() as string
-        );
+        const slugs = batch.map((blog) => blog.slug);
         await client.query(
           `DELETE FROM "public"."documents" WHERE slug = ANY($1)`,
           [slugs]

@@ -1,10 +1,8 @@
-const { withContentlayer } = require("next-contentlayer2");
+const { withContentCollections } = require("@content-collections/next");
 
 /** @type {import('next').NextConfig} */
-const nextConfig = { reactStrictMode: true };
-
-module.exports = withContentlayer({
-  ...nextConfig,
+const nextConfig = {
+  reactStrictMode: true,
   webpack: function (config, options) {
     config.module.rules.push({
       test: /\.md$/,
@@ -13,4 +11,6 @@ module.exports = withContentlayer({
 
     return config;
   },
-});
+};
+
+module.exports = withContentCollections(nextConfig);

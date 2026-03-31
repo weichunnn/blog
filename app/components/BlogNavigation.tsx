@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { allBlogs, Blog } from "contentlayer/generated";
+import { allBlogs, Blog } from "content-collections";
 import { compareDesc } from "date-fns";
 
 interface BlogNavigationProps {

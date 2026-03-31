@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { allBlogs, Blog } from "contentlayer/generated";
+import { allBlogs, Blog } from "content-collections";
 import { compareDesc } from "date-fns";
 import BlogPost from "@/components/BlogPost";
 import Header from "@/components/Header";
